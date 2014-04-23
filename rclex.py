@@ -49,16 +49,6 @@ class RcLex(object):
     #############################################
     
     t_ignore = r'[ \t\r]+'
-    t_COMMA = r','
-    t_PIPE = r'\|'
-    t_CARET = r'\^'
-    t_AND = r'&'
-    t_MINUS = r'\-'
-    t_PLUS = r'\+'
-    t_PERCENT = r'%'
-    t_TIMES = r'\*'
-    t_DIVIDE = r'/'
-    t_TILDE = r'\~'
     
     def t_BLOCK(self, t):
         r'BLOCK[ \t\n]*"([^\#\n]*)"'
@@ -115,10 +105,24 @@ class RcLex(object):
 #     def t_IGNORE(self, t):
 #         r'[ \t\r]+'
 #         pass
+
+    t_COMMA = r','
+    t_PIPE = r'\|'
+    t_CARET = r'\^'
+    t_AND = r'&'
+    t_MINUS = r'\-'
+    t_PLUS = r'\+'
+    t_PERCENT = r'%'
+    t_TIMES = r'\*'
+    t_DIVIDE = r'/'
+    t_TILDE = r'\~'
+    t_EQUAL = '='
+    t_OPEN_PAREN = r'\('
+    t_CLOSE_PAREN = r'\)'
     
     def t_ANYONE(self, t):
         r'.'
-        return t
+        pass
     
     def t_error(self, t):
         print("Illegal character %s" % repr(t.value[0]))

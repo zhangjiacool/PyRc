@@ -13,7 +13,7 @@ if sys.version_info[0] >= 3:
 import ply.yacc as yacc
 
 
-class MyClass(object):
+class RcParse(object):
     '''
     classdocs
     '''
@@ -536,6 +536,64 @@ class MyClass(object):
         pass
     
     #An expression with a leading comma.
+    
+    def p_cnumexpr(self, p):
+        '''cnumexpr : COMMA numexpr'''
+        pass
+    
+    #A possibly negated numeric expression.
+    
+    def p_numexpr(self, p):
+        '''numexpr : sizednumexpr'''
+        pass
+    
+    #A possibly negated expression with a size.
+    
+    def p_sizednumexpr(self, p):
+        '''sizednumexpr : NUMBER
+                        | OPEN_PAREN sizednumexpr CLOSE_PAREN
+                        | TILDE sizednumexpr %prec TILDE
+                        | MINUS sizednumexpr %prec NEG
+                        | sizednumexpr TIMES sizednumexpr
+                        | sizednumexpr DIVIDE sizednumexpr
+                        | sizednumexpr PERCENT sizednumexpr
+                        | sizednumexpr PLUS sizednumexpr
+                        | sizednumexpr MINUS sizednumexpr
+                        | sizednumexpr AND sizednumexpr
+                        | sizednumexpr CARET sizednumexpr
+                        | sizednumexpr PIPE sizednumexpr'''
+        pass
+    
+#     An expression with a leading comma which does not use unary
+#     negation.
+
+    def p_cposnumexpr(self, p):
+        '''cposnumexpr : COMMA posnumexpr'''
+        pass
+    
+    #An expression which does not use unary negation.
+    
+    def p_posnumexpr(self, p):
+        '''posnumexpr : sizedposnumexpr'''
+        pass
+    
+#     An expression which does not use unary negation.  We separate unary
+#     negation to avoid parsing conflicts when two numeric expressions
+#     appear consecutively.
+
+    def p_sizedposnumexpr(self, p):
+        '''sizedposnumexpr : NUMBER
+                           | OPEN_PAREN sizednumexpr CLOSE_PAREN
+                           | TILDE sizednumexpr %prec TILDE
+                           | sizedposnumexpr TIMES sizednumexpr
+                           | sizedposnumexpr DIVIDE sizednumexpr
+                           | sizedposnumexpr PERCENT sizednumexpr
+                           | sizedposnumexpr PLUS sizednumexpr
+                           | sizedposnumexpr MINUS sizednumexpr
+                           | sizedposnumexpr AND sizednumexpr
+                           | sizedposnumexpr CARET sizednumexpr
+                           | sizedposnumexpr PIPE sizednumexpr'''
+        pass
 
         
     

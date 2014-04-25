@@ -33,8 +33,9 @@ class RcLex(object):
                 )
     
     tokens = reserved + ('BLOCK', 'BLOCKSTRINGFILEINFO', 'BLOCKVARFILEINFO', 'NUMBER',
-                         'QUOTEDSTRING', 'STRING', 'INCLUDE', 'COMMA', 'PIPE', 'CARET',
-                         'AND', 'MINUS', 'PLUS', 'PERCENT', 'TIMES', 'DIVIDE', 'TILDE'
+                         'QUOTEDSTRING', 'SIZEDSTRING', 'STRING', 'INCLUDE', 'COMMA', 'PIPE', 'CARET',
+                         'AND', 'MINUS', 'PLUS', 'PERCENT', 'TIMES', 'DIVIDE', 'TILDE', 'SIZEDUNISTRING',
+                         'IGNORED_TOKEN'
                         )
     
     reserved_map = {}
@@ -45,6 +46,14 @@ class RcLex(object):
         '''
         for r in self.reserved:
             self.reserved_map[r.upper()] = r
+            
+        self.rcdata_mode = 0
+        
+    def rcparse_rcdata(self):
+        self.rcdata_mode = 1
+    
+    def rcparse_normal(self):
+        self.rcdata_mode = 1
     
     #############################################
     
@@ -63,10 +72,10 @@ class RcLex(object):
 
     def t_INCLUDE(self, t):
         r'\#include[ \t]*"[ \t]*([\w\d\.\\]+)"'
-        return t
+        pass
     
     def t_OTHERMACRO(self, t):
-        r'\#[^\r\n]*\n'
+        r'\#[^\n]*'
         pass
         
     def t_NUMBER(self, t):
@@ -75,6 +84,8 @@ class RcLex(object):
         
     def t_QUOTEDSTRING(self, t):
         r'("[^\"\n]*"[ \t\n]*)+'
+        if self.rcdata_mode == 1:
+            t.type = 'SIZEDSTRING'
         return t
             
     def t_STRING(self, t):

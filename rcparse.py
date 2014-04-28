@@ -11,6 +11,8 @@ if sys.version_info[0] >= 3:
     raw_input = input
 
 import ply.yacc as yacc
+import RcData.RcTree as RcTree
+import RcData.RcObject as RcObject
 
 
 class RcParse(object):
@@ -33,6 +35,10 @@ class RcParse(object):
         '''
         Constructor
         '''
+        self.rcTree = RcTree()
+        
+    def addObj(self, rcName, rcType):
+        return self.rcTree.addObj(rcName, rcType)
         
     ###############################
     
@@ -63,7 +69,7 @@ class RcParse(object):
     #Accelerator resources.
     def p_accelerator(self, p):
         '''accelerator : id ACCELERATORS suboptions BEG acc_entries END'''
-        pass
+        self.addObj(p[1], 'ACCELERATORS')
   
     def p_acc_entries(self, p):
         '''acc_entries : empty
@@ -100,13 +106,13 @@ class RcParse(object):
     
     def p_bitmap(self, p):
         '''bitmap : id BITMAP memflags_move file_name'''
-        pass
+        self.addObj(p[1], 'BITMAP')
     
     #Cursor resources.
     
     def p_cursor(self, p):
         '''cursor : id CURSOR memflags_move_discard file_name'''
-        pass
+        self.addObj(p[1], 'CURSOR')
     
     #Dialog resources.
     
@@ -114,7 +120,10 @@ class RcParse(object):
         '''dialog : id DIALOG memflags_move exstyle posnumexpr cnumexpr cnumexpr cnumexpr styles BEG controls END
                   | id DIALOGEX memflags_move exstyle posnumexpr cnumexpr cnumexpr cnumexpr styles BEG controls END
                   | id DIALOGEX memflags_move exstyle posnumexpr cnumexpr cnumexpr cnumexpr cnumexpr styles BEG controls END'''
-        pass
+        if len(p) == 13:
+            pass
+        else:
+            pass
     
     def p_exstyle(self, p):
         '''exstyle : empty
@@ -419,7 +428,8 @@ class RcParse(object):
     
     def p_resname(self, p):
         '''resname : res_unicode_string
-                   | STRING'''
+                   | STRING
+                   | NUMBER'''
         pass
     
     def p_resref(self, p):

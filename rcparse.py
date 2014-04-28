@@ -83,7 +83,6 @@ class RcParse(object):
     
     def p_acc_event(self, p):
         '''acc_event : QUOTEDSTRING
-                     | QUOTEDSTRING
                      | posnumexpr'''
         pass
     
@@ -438,7 +437,7 @@ class RcParse(object):
                   | resname COMMA'''
         pass
     
-#     Generic suboptions.  These may appear before the BEGIN in any
+#     Generic suboptions.  These may appear before the BEGIN in an    y
 #     multiline statement.
     def p_suboptions(self, p):
         '''suboptions : empty

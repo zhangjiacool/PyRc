@@ -13,12 +13,18 @@ if sys.version_info[0] >= 3:
 import ply.yacc as yacc
 import RcData.RcTree as RcTree
 import RcData.RcObject as RcObject
+import RcData.Pair as Pair
 
+rc_accelerator = "ACCELERATOR"
+rc_accelerators = "ACCELERATORS"
+rc_bitmp = 'BITMAP'
+rc_cursor = 'CURSOR'
+rc_dialog = 'DIALOG'
 
 class RcParse(object):
     '''
     classdocs
-    '''
+    '''  
     tokens = rclex.RcLex.tokens
     
     precedence = (
@@ -63,23 +69,30 @@ class RcParse(object):
         pass
         
     def p_empty(self, p):
-        '''empty : empty'''
-        pass
+        '''empty : '''
+        p[0] = None
     
     #Accelerator resources.
     def p_accelerator(self, p):
         '''accelerator : id ACCELERATORS suboptions BEG acc_entries END'''
-        self.addObj(p[1], 'ACCELERATORS')
+        p[0] = self.addObj(p[1], rc_accelerators)
+        for acc in p[5]:
+            if acc:
+                acc.addParent(rc_accelerators, p[0])
+                p[0].addChild(acc.first, acc.second)
   
     def p_acc_entries(self, p):
         '''acc_entries : empty
                        | acc_entries acc_entry'''
-        pass
+        if p[1]:
+            p[0] = p[1].append(p[2])
+        else:
+            p[0] = []
         
     def p_acc_entry(self, p):
-        '''acc_entry : acc_event cposnumexpr
-                     | acc_event cposnumexpr COMMA acc_options'''
-        pass
+        '''acc_entry : acc_event COMMA id
+                     | acc_event COMMA id COMMA acc_options'''
+        p[0] = Pair(rc_accelerator, self.addObj(p[3], rc_accelerator))
     
     def p_acc_event(self, p):
         '''acc_event : QUOTEDSTRING
@@ -105,13 +118,13 @@ class RcParse(object):
     
     def p_bitmap(self, p):
         '''bitmap : id BITMAP memflags_move file_name'''
-        self.addObj(p[1], 'BITMAP')
+        p[0] = self.addObj(p[1], rc_bitmp)
     
     #Cursor resources.
     
     def p_cursor(self, p):
         '''cursor : id CURSOR memflags_move_discard file_name'''
-        self.addObj(p[1], 'CURSOR')
+        p[0] = self.addObj(p[1], rc_cursor)
     
     #Dialog resources.
     
@@ -120,9 +133,14 @@ class RcParse(object):
                   | id DIALOGEX memflags_move exstyle posnumexpr cnumexpr cnumexpr cnumexpr styles BEG controls END
                   | id DIALOGEX memflags_move exstyle posnumexpr cnumexpr cnumexpr cnumexpr cnumexpr styles BEG controls END'''
         if len(p) == 13:
-            pass
+            idx = 11
         else:
-            pass
+            idx = 12
+        p[0] = self.addObj(p[1], rc_dialog)
+        for acc in p[idx]:
+            if acc:
+                acc.addParent(rc_dialog, p[0])
+                p[0].addChild(acc.first, acc.second)
     
     def p_exstyle(self, p):
         '''exstyle : empty
@@ -149,7 +167,10 @@ class RcParse(object):
     def p_controls(self, p):
         '''controls : empty
                     | controls control'''
-        pass
+        if p[1]:
+            p[0] = p[1].append(p[2])
+        else:
+            p[0] = []
     
     def p_control(self, p):
         '''control : AUTO3STATE optresidc
